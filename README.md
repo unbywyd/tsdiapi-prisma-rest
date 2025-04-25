@@ -15,7 +15,7 @@ This is a **TSDIAPI** plugin that provides a single dynamic endpoint to access y
 You can install this plugin using npm:
 
 ```bash
-npm install --save @tsdiapi/prisma-rest
+tsdiapi add @tsdiapi/prisma-rest
 ```
 
 Then, register the plugin in your TSDIAPI project:
