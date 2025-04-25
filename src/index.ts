@@ -63,25 +63,17 @@ class App implements AppPlugin {
 
     async onInit(ctx: AppContext) {
         this.context = ctx;
-        const appConfig = this.context.projectConfig.getConfig({
-            PRISMA_REST_METHODS: this.config.availableMethods.join(',') || '*',
-            PRISMA_REST_MODELS: this.config.availableModels.join(',') || '*',
-            PRISMA_REST_ALLOWED_IPS: this.config.allowedIps.join(',') || '127.0.0.1,::1',
-            PRISMA_REST_ENABLED: this.config.enabled,
-            PRISMA_REST_GUARD: this.config.guard
-        }) as {
-            PRISMA_REST_METHODS: string;
-            PRISMA_REST_MODELS: string;
-            PRISMA_REST_ALLOWED_IPS: string;
-            PRISMA_REST_ENABLED: boolean;
-            PRISMA_REST_GUARD: string;
-        };
+        const methods = this.context.projectConfig.get('PRISMA_REST_METHODS', this.config.availableMethods.join(',') || '*') as string;
+        const models = this.context.projectConfig.get('PRISMA_REST_MODELS', this.config.availableModels.join(',') || '*') as string;
+        const ips = this.context.projectConfig.get('PRISMA_REST_ALLOWED_IPS', this.config.allowedIps.join(',') || '127.0.0.1,::1') as string;
+        const enabled = this.context.projectConfig.get('PRISMA_REST_ENABLED', this.config.enabled) as boolean;
+        const guard = this.context.projectConfig.get('PRISMA_REST_GUARD', this.config.guard) as string;
 
-        this.config.availableMethods = this.parseConfigValue(appConfig.PRISMA_REST_METHODS);
-        this.config.availableModels = this.parseConfigValue(appConfig.PRISMA_REST_MODELS);
-        this.config.allowedIps = this.parseConfigValue(appConfig.PRISMA_REST_ALLOWED_IPS);
-        this.config.enabled = appConfig.PRISMA_REST_ENABLED;
-        this.config.guard = appConfig.PRISMA_REST_GUARD;
+        this.config.availableMethods = this.parseConfigValue(methods);
+        this.config.availableModels = this.parseConfigValue(models);
+        this.config.allowedIps = this.parseConfigValue(ips);
+        this.config.enabled = enabled;
+        this.config.guard = guard;
 
         this.allMethods = this.checkWildcard(this.config.availableMethods);
         this.allModels = this.checkWildcard(this.config.availableModels);
