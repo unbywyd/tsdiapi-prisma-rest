@@ -2,6 +2,7 @@ import { AppContext, ResponseErrorSchema } from "@tsdiapi/server";
 import { Type } from "@sinclair/typebox";
 import { JWTGuard } from "@tsdiapi/jwt-auth";
 import { usePrisma } from "@tsdiapi/prisma";
+import { FilterFunction, ModelMapping } from "./index.js";
 
 export type RegisterMetaRoutesOptions = {
     allModels: boolean;
@@ -11,6 +12,8 @@ export type RegisterMetaRoutesOptions = {
     availableMethods: string[];
     allowedIps: string[];
     guard?: string;
+    filter?: FilterFunction;
+    access: ModelMapping;
 }
 export default async function registerMetaRoutes({ useRoute }: AppContext, options: RegisterMetaRoutesOptions) {
     const ModelParamSchema = Type.Object({
@@ -47,6 +50,16 @@ export default async function registerMetaRoutes({ useRoute }: AppContext, optio
             if (!allIps && !allowedIps.includes(req.ip)) {
                 return { status: 403, data: { error: "Forbidden" } };
             }
+
+            // Check if method is allowed for this specific model
+            const modelConfig = options.access[req.params.model];
+            if (modelConfig?.allowedMethods && !modelConfig.allowedMethods.includes(req.params.method)) {
+                return { status: 400, data: { error: `Method ${req.params.method} is not allowed for model ${req.params.model}` } };
+            }
+            if (modelConfig?.allowedIps && !modelConfig.allowedIps.includes(req.ip)) {
+                return { status: 403, data: { error: "Forbidden" } };
+            }
+
             return true;
         })
         .handler(async (req) => {
@@ -62,7 +75,22 @@ export default async function registerMetaRoutes({ useRoute }: AppContext, optio
             }
 
             try {
-                const result = await prisma[req.params.model][req.params.method](req.body);
+                let body = req.body;
+                if (options.filter) {
+                    try {
+                        body = await options.filter(req.params.model, req.params.method, body, req);
+                    } catch (error) {
+                        return { status: 400, data: { error: error.message } };
+                    }
+                }
+                if (options.access[req.params.model]?.filter) {
+                    try {
+                        body = await options.access[req.params.model].filter(req.params.model, req.params.method, body, req);
+                    } catch (error) {
+                        return { status: 400, data: { error: error.message } };
+                    }
+                }
+                const result = await prisma[req.params.model][req.params.method](body);
                 return { status: 200, data: result };
             } catch (error) {
                 return { status: 400, data: { error: error.message } };

@@ -38,6 +38,8 @@ createApp({
 - 🌐 **IP Restrictions** - Control access based on IP addresses
 - 🎯 **Method Control** - Enable/disable specific Prisma methods
 - 🏷️ **Model Selection** - Choose which models to expose through the API
+- 🔍 **Request Filtering** - Modify or validate request data before processing
+- 🎛️ **Model-Specific Configuration** - Fine-grained control over methods and IPs per model
 
 ## 📱 Prisma REST Client
 
@@ -139,7 +141,23 @@ This plugin can be configured through environment variables or during initializa
 
 ```typescript
 createPlugin({
-  enabled: true
+  enabled: true,
+  // Global filter function
+  filter: async (model, method, request, req) => {
+    // Modify or validate request data
+    return request;
+  },
+  // Model-specific configurations
+  access: {
+    User: {
+      allowedMethods: ['findMany', 'findUnique'],
+      allowedIps: ['127.0.0.1'],
+      filter: async (model, method, request, req) => {
+        // Model-specific request filtering
+        return request;
+      }
+    }
+  }
 });
 ```
 
@@ -152,6 +170,67 @@ createPlugin({
 | PRISMA_REST_MODELS | string | "*" | Comma-separated list of models to expose |
 | PRISMA_REST_ALLOWED_IPS | string | "127.0.0.1,::1" | Comma-separated list of allowed IP addresses |
 | PRISMA_REST_GUARD | string | "admin" | Guard name for JWT authentication |
+
+### Advanced Configuration
+
+#### Request Filtering
+You can add a global filter function or model-specific filters to modify or validate request data:
+
+```typescript
+createPlugin({
+  // Global filter for all models
+  filter: async (model, method, request, req) => {
+    // Add timestamp to all requests
+    return {
+      ...request,
+      timestamp: new Date().toISOString()
+    };
+  },
+  access: {
+    User: {
+      // Model-specific filter
+      filter: async (model, method, request, req) => {
+        // Validate user creation
+        if (method === 'create' && !request.email) {
+          throw new Error('Email is required for user creation');
+        }
+        return request;
+      }
+    }
+  }
+});
+```
+
+#### Model-Specific Configuration
+You can configure allowed methods and IP addresses for specific models:
+
+```typescript
+createPlugin({
+  access: {
+    User: {
+      allowedMethods: ['findMany', 'findUnique'], // Only allow read operations
+      allowedIps: ['127.0.0.1', '192.168.1.1']   // Restrict access to specific IPs
+    },
+    Post: {
+      allowedMethods: ['create', 'update'],       // Only allow write operations
+      allowedIps: ['*']                           // Allow all IPs
+    }
+  }
+});
+```
+
+### Filter Function Parameters
+The filter function receives the following parameters:
+- `model`: The Prisma model name
+- `method`: The Prisma method being called
+- `request`: The request body data
+- `req`: The full request object with state
+
+The filter function can:
+- Modify the request data
+- Validate the request data
+- Throw errors to prevent invalid operations
+- Access request state and headers
 
 ---
 

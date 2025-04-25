@@ -1,5 +1,16 @@
-import type { AppContext, AppPlugin } from "@tsdiapi/server";
+import type { AppContext, AppPlugin, RequestWithState } from "@tsdiapi/server";
 import registerMetaRoutes from "./controller.js";
+
+
+export type FilterFunction = <T = any>(model: string, method: string, request: T, req: RequestWithState) => Promise<T>;
+
+export type ModelMapping = {
+    [key: string]: {
+        allowedMethods?: string[];
+        allowedIps?: string[];
+        filter?: FilterFunction;
+    };
+}
 
 export type PluginOptions = {
     availableMethods?: string[] | string;
@@ -7,6 +18,8 @@ export type PluginOptions = {
     allowedIps?: string[] | string;
     enabled?: boolean;
     guard?: string;
+    filter?: FilterFunction;
+    access?: ModelMapping;
 }
 
 type Config = {
@@ -15,6 +28,8 @@ type Config = {
     allowedIps: string[];
     enabled: boolean;
     guard: string;
+    filter?: FilterFunction;
+    access: ModelMapping;
 }
 
 class App implements AppPlugin {
@@ -36,7 +51,9 @@ class App implements AppPlugin {
             availableModels: [],
             allowedIps: [],
             enabled: false,
-            guard: 'admin'
+            guard: 'admin',
+            filter: undefined,
+            access: {}
         };
 
         if (!options) return defaultConfig;
@@ -47,7 +64,9 @@ class App implements AppPlugin {
             availableModels: this.parseConfigValue(options.availableModels || []),
             allowedIps: this.parseConfigValue(options.allowedIps || []),
             enabled: options.enabled ?? defaultConfig.enabled,
-            guard: options.guard || defaultConfig.guard
+            guard: options.guard || defaultConfig.guard,
+            filter: options.filter,
+            access: options.access || {}
         };
     }
 
@@ -90,7 +109,9 @@ class App implements AppPlugin {
             availableModels: this.config.availableModels,
             availableMethods: this.config.availableMethods,
             allowedIps: this.config.allowedIps,
-            guard: this.config.guard
+            guard: this.config.guard,
+            filter: this.config.filter,
+            access: this.config.access
         });
     }
 }
