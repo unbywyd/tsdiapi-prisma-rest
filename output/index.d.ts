@@ -1,10 +1,20 @@
-import type { AppContext, AppPlugin } from "@tsdiapi/server";
+import type { AppContext, AppPlugin, RequestWithState } from "@tsdiapi/server";
+export type FilterFunction = <T = any>(model: string, method: string, request: T, req: RequestWithState) => Promise<T>;
+export type ModelMapping = {
+    [key: string]: {
+        allowedMethods?: string[];
+        allowedIps?: string[];
+        filter?: FilterFunction;
+    };
+};
 export type PluginOptions = {
     availableMethods?: string[] | string;
     availableModels?: string[] | string;
     allowedIps?: string[] | string;
     enabled?: boolean;
     guard?: string;
+    filter?: FilterFunction;
+    access?: ModelMapping;
 };
 type Config = {
     availableMethods: string[];
@@ -12,6 +22,8 @@ type Config = {
     allowedIps: string[];
     enabled: boolean;
     guard: string;
+    filter?: FilterFunction;
+    access: ModelMapping;
 };
 declare class App implements AppPlugin {
     name: string;

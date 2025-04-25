@@ -16,7 +16,9 @@ class App {
             availableModels: [],
             allowedIps: [],
             enabled: false,
-            guard: 'admin'
+            guard: 'admin',
+            filter: undefined,
+            access: {}
         };
         if (!options)
             return defaultConfig;
@@ -26,7 +28,9 @@ class App {
             availableModels: this.parseConfigValue(options.availableModels || []),
             allowedIps: this.parseConfigValue(options.allowedIps || []),
             enabled: options.enabled ?? defaultConfig.enabled,
-            guard: options.guard || defaultConfig.guard
+            guard: options.guard || defaultConfig.guard,
+            filter: options.filter,
+            access: options.access || {}
         };
     }
     parseConfigValue(value) {
@@ -65,7 +69,9 @@ class App {
             availableModels: this.config.availableModels,
             availableMethods: this.config.availableMethods,
             allowedIps: this.config.allowedIps,
-            guard: this.config.guard
+            guard: this.config.guard,
+            filter: this.config.filter,
+            access: this.config.access
         });
     }
 }
