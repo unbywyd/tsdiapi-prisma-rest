@@ -35,7 +35,7 @@ class App implements AppPlugin {
             availableMethods: [],
             availableModels: [],
             allowedIps: [],
-            enabled: true,
+            enabled: false,
             guard: 'admin'
         };
 

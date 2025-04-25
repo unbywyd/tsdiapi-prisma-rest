@@ -3,7 +3,7 @@
   "description": "A TSDIAPI plugin that provides full REST API access to your Prisma models with built-in security controls. Automatically generates CRUD endpoints for your Prisma models with configurable access methods, model restrictions, and security features.",
   "registration": {
     "pluginImportName": "PrismaRestPlugin",
-    "pluginArgs": "{ enabled: true, guard: 'admin', allowedIps: '127.0.0.1,::1', availableModels: '*', availableMethods: '*' }"
+    "pluginArgs": "{ enabled: false }"
   },
   "variables": [
     {
