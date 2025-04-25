@@ -1,0 +1,48 @@
+{
+  "name": "@tsdiapi/prisma-rest",
+  "description": "A TSDIAPI plugin that provides full REST API access to your Prisma models with built-in security controls.",
+  "version": "0.2.0",
+  "main": "output/index.js",
+  "types": "output/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "unbywyd",
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "keywords": [
+    "tsdiapi",
+    "prisma",
+    "rest",
+    "api",
+    "crud"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unbywyd/tsdiapi-prisma-rest"
+  },
+  "homepage": "https://github.com/unbywyd/tsdiapi-prisma-rest",
+  "files": [
+    "output/",
+    "README.md",
+    "LICENSE.md",
+    "tsdiapi.config.json",
+    "files/",
+    "generators/"
+  ],
+  "devDependencies": {
+    "@tsdiapi/server": "^0.2.36",
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  },
+  "peerDependencies": {
+    "@tsdiapi/jwt-auth": "^0.2.9",
+    "@tsdiapi/prisma": "^0.2.7"
+  }
+}

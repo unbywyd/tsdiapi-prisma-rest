@@ -1,0 +1,80 @@
+{
+  "name": "@tsdiapi/prisma-rest",
+  "description": "A TSDIAPI plugin that provides full REST API access to your Prisma models with built-in security controls. Automatically generates CRUD endpoints for your Prisma models with configurable access methods, model restrictions, and security features.",
+  "registration": {
+    "pluginImportName": "PrismaRestPlugin",
+    "pluginArgs": "{ enabled: true, guard: 'admin', allowedIps: '127.0.0.1,::1', availableModels: '*', availableMethods: '*' }"
+  },
+  "variables": [
+    {
+      "name": "PRISMA_REST_ENABLED",
+      "type": "boolean",
+      "default": true,
+      "configurable": true,
+      "description": "Enable Prisma REST API? Automatically registers controllers for Prisma models.",
+      "inquirer": {
+        "type": "confirm",
+        "message": "Do you want to enable automatic controller registration?",
+        "default": true
+      } 
+    },
+    {
+      "name": "PRISMA_REST_METHODS",
+      "type": "string",
+      "default": "*",
+      "configurable": true,
+      "description": "Comma-separated list of Prisma methods to enable (findFirst,findFirstOrThrow,findMany,findUnique,findUniqueOrThrow,create,update,delete,groupBy,aggregate)",
+      "inquirer": {
+        "type": "input",
+        "message": "Enter comma-separated list of Prisma methods to enable:",
+        "default": "*"
+      }
+    },
+    {
+      "name": "PRISMA_REST_MODELS",
+      "type": "string",
+      "default": "*",
+      "configurable": true,
+      "description": "Comma-separated list of Prisma models to enable (user,post,comment)",
+      "inquirer": {
+        "type": "input",
+        "message": "Enter comma-separated list of Prisma models to enable:",
+        "default": "*"
+      }
+    },
+    {
+      "name": "PRISMA_REST_ALLOWED_IPS",
+      "type": "string",
+      "default": "127.0.0.1,::1",
+      "configurable": true,
+      "description": "Comma-separated list of allowed IP addresses (127.0.0.1,::1)",
+      "inquirer": {
+        "type": "input",
+        "message": "Enter comma-separated list of allowed IP addresses:",
+        "default": "127.0.0.1,::1"
+      }
+    },
+    {
+      "name": "PRISMA_REST_GUARD",
+      "type": "string",
+      "default": "admin",
+      "configurable": true,
+      "description": "Guard name to use for API protection",
+      "inquirer": {
+        "type": "input",
+        "message": "Enter guard name:",
+        "default": "admin"
+      }
+    }
+  ],
+  "prisma": {
+    "required": true
+  },
+  "requiredPackages": [
+    "@tsdiapi/jwt-auth"
+  ],
+  "postMessages": [
+    "✅ Plugin @tsdiapi/prisma-rest has been successfully installed!",
+    "📖 Check the documentation for more details!"
+  ]
+}
