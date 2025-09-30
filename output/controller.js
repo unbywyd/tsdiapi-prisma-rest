@@ -1,7 +1,7 @@
 import { ResponseErrorSchema } from "@tsdiapi/server";
 import { Type } from "@sinclair/typebox";
-import { JWTGuard } from "@tsdiapi/jwt-auth";
 import { usePrisma } from "@tsdiapi/prisma";
+import { HybridAuthGuard } from "@tsdiapi/jwt-auth";
 export default async function registerMetaRoutes({ useRoute }, options) {
     const ModelParamSchema = Type.Object({
         model: Type.String(),
@@ -22,7 +22,7 @@ export default async function registerMetaRoutes({ useRoute }, options) {
         default: {}
     }))
         .auth('bearer')
-        .guard(JWTGuard({
+        .guard(HybridAuthGuard({
         guardName: guard || 'admin'
     }))
         .guard(async (req) => {
