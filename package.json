@@ -1,7 +1,7 @@
 {
   "name": "@tsdiapi/prisma-rest",
   "description": "A TSDIAPI plugin that provides full REST API access to your Prisma models with built-in security controls.",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "main": "output/index.js",
   "types": "output/index.d.ts",
   "type": "module",
@@ -43,7 +43,7 @@
   },
   "peerDependencies": {
     "@tsdiapi/jwt-auth": "^0.3.0",
-    "@tsdiapi/prisma": "^0.3.0"
+    "@tsdiapi/prisma": "^0.4.0"
   },
   "dependencies": {
     "@sinclair/typebox": "^0.34.41"
