@@ -1,26 +1,30 @@
-import { ResponseErrorSchema } from "@tsdiapi/server";
+import { ResponseErrorSchema, addSchema } from "@tsdiapi/server";
 import { Type } from "@sinclair/typebox";
 import { usePrisma } from "@tsdiapi/prisma";
 import { HybridAuthGuard } from "@tsdiapi/jwt-auth";
 export default async function registerMetaRoutes({ useRoute }, options) {
-    const ModelParamSchema = Type.Object({
+    const ModelParamSchema = addSchema(Type.Object({
         model: Type.String(),
         method: Type.String()
-    });
+    }, { $id: 'PrismaRestModelParamSchema' }));
     const { availableMethods, availableModels, allowedIps, allMethods, allModels, allIps, guard } = options;
+    const AnyResponseSchema = addSchema(Type.Object({}, {
+        additionalProperties: true,
+        $id: 'PrismaRestAnyResponseSchema'
+    }));
+    const AnyBodySchema = addSchema(Type.Object({}, {
+        additionalProperties: true,
+        $id: 'PrismaRestAnyBodySchema'
+    }));
     useRoute("prisma")
         .post("/:method/:model")
         .version("1")
-        .code(200, Type.Any({
-        default: {}
-    }))
+        .code(200, AnyResponseSchema)
         .code(400, ResponseErrorSchema)
         .code(403, ResponseErrorSchema)
         .code(500, ResponseErrorSchema)
         .params(ModelParamSchema)
-        .body(Type.Any({
-        default: {}
-    }))
+        .body(AnyBodySchema)
         .auth('bearer')
         .guard(HybridAuthGuard({
         guardName: guard || 'admin'
