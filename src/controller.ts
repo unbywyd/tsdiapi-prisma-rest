@@ -1,4 +1,4 @@
-import { AppContext, ResponseErrorSchema } from "@tsdiapi/server";
+import { AppContext, ResponseErrorSchema, addSchema } from "@tsdiapi/server";
 import { Type } from "@sinclair/typebox";
 import { usePrisma } from "@tsdiapi/prisma";
 import { FilterFunction, ModelMapping } from "./index.js";
@@ -16,26 +16,32 @@ export type RegisterMetaRoutesOptions = {
     access: ModelMapping;
 }
 export default async function registerMetaRoutes({ useRoute }: AppContext, options: RegisterMetaRoutesOptions) {
-    const ModelParamSchema = Type.Object({
+    const ModelParamSchema = addSchema(Type.Object({
         model: Type.String(),
         method: Type.String()
-    });
+    }, { $id: 'PrismaRestModelParamSchema' }));
 
     const { availableMethods, availableModels, allowedIps, allMethods, allModels, allIps, guard } = options;
+
+    const AnyResponseSchema = addSchema(Type.Object({}, {
+        additionalProperties: true,
+        $id: 'PrismaRestAnyResponseSchema'
+    }));
+
+    const AnyBodySchema = addSchema(Type.Object({}, {
+        additionalProperties: true,
+        $id: 'PrismaRestAnyBodySchema'
+    }));
 
     useRoute("prisma")
         .post("/:method/:model")
         .version("1")
-        .code(200, Type.Any({
-            default: {}
-        }))
+        .code(200, AnyResponseSchema)
         .code(400, ResponseErrorSchema)
         .code(403, ResponseErrorSchema)
         .code(500, ResponseErrorSchema)
         .params(ModelParamSchema)
-        .body(Type.Any({
-            default: {}
-        }))
+        .body(AnyBodySchema)
         .auth('bearer')
         .guard(HybridAuthGuard({
             guardName: guard || 'admin'
@@ -63,7 +69,7 @@ export default async function registerMetaRoutes({ useRoute }: AppContext, optio
             return true;
         })
         .handler(async (req) => {
-            const prisma = usePrisma<any>();
+            const prisma = usePrisma() as Record<string, any>;
             if (!prisma) {
                 return { status: 500, data: { error: "Prisma client not found" } };
             }
