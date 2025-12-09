@@ -23,8 +23,7 @@ export default async function registerMetaRoutes({ useRoute }: AppContext, optio
 
     const { availableMethods, availableModels, allowedIps, allMethods, allModels, allIps, guard } = options;
 
-    const AnyResponseSchema = addSchema(Type.Object({}, {
-        additionalProperties: true,
+    const AnyResponseSchema = addSchema(Type.Any({
         $id: 'PrismaRestAnyResponseSchema'
     }));
 
